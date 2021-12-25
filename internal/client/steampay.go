@@ -7,13 +7,14 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
-func (c *Client) GetGOGPriceByName(name string) (model.GamePriceResponse, error) {
-	link := "https://embed.gog.com/games/ajax/filtered?mediaType=game&"
+func (c *Client) GetSteamPayPriceByName(name string) (model.GamePriceResponse, error) {
+	link := "https://steampay.com/api/search?"
 
 	params := url.Values{}
-	params.Add("search", name)
+	params.Add("query", name)
 	link = link + params.Encode()
 
 	req, err := http.NewRequest(http.MethodGet, link, nil)
@@ -36,24 +37,23 @@ func (c *Client) GetGOGPriceByName(name string) (model.GamePriceResponse, error)
 		return model.GamePriceResponse{}, err
 	}
 
-	var GOGResponse model.GOGResponseModel
+	var SteamPayResponse model.SteamPayResponse
 
-	err = json.Unmarshal(b, &GOGResponse)
+	err = json.Unmarshal(b, &SteamPayResponse)
 	if err != nil {
-		log.Println("Unmarshal error", err)
-		return model.GamePriceResponse{}, err
+		log.Println(err)
+		return model.GamePriceResponse{}, nil
 	}
 
 	var PriceResponse model.GamePriceResponse
-	PriceResponse.StoreName = "gog"
+	PriceResponse.StoreName = "steampay"
 	PriceResponse.StoreAppName = name
 
 	found := false
 
-	for _, i := range GOGResponse.Products {
+	for _, i := range SteamPayResponse.Products {
 		if i.Title == name {
-			PriceResponse.StoreAppID = i.ID
-			PriceResponse.StorePrice = i.Price.FinalAmount + " руб."
+			PriceResponse.StorePrice = strconv.Itoa(i.Prices.Rub) + " руб."
 			found = true
 		}
 	}

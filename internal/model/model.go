@@ -209,3 +209,21 @@ type GOGResponseModel struct {
 	TotalGamesFound  int         `json:"totalGamesFound"`
 	TotalMoviesFound int         `json:"totalMoviesFound"`
 }
+
+type SteamPayResponse struct {
+	Error    int `json:"error"`
+	Products []struct {
+		URL         string `json:"url"`
+		Title       string `json:"title"`
+		NumInStock  int    `json:"num_in_stock"`
+		Activation  string `json:"activation"`
+		IsAvailable bool   `json:"is_available"`
+		Image       string `json:"image"`
+		Prices      struct {
+			Rub int     `json:"rub"`
+			Usd float64 `json:"usd"`
+			Eur float64 `json:"eur"`
+			Grn int     `json:"grn"`
+		} `json:"prices"`
+	} `json:"products"`
+}
