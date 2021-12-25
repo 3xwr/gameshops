@@ -8,13 +8,15 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 )
 
-func (c *Client) GetSteamPayPriceByName(name string) (model.GamePriceResponse, error) {
-	link := "https://steampay.com/api/search?"
-
+func (c *Client) GetPlatiruPriceByName(name string) (model.GamePriceResponse, error) {
+	link := "https://plati.io/api/search.ashx?"
 	params := url.Values{}
+	params.Add("response", "json")
 	params.Add("query", name)
+
 	link = link + params.Encode()
 
 	req, err := http.NewRequest(http.MethodGet, link, nil)
@@ -37,30 +39,38 @@ func (c *Client) GetSteamPayPriceByName(name string) (model.GamePriceResponse, e
 		return model.GamePriceResponse{}, err
 	}
 
-	var SteamPayResponse model.SteamPayResponseModel
+	var PlatiruResponse model.PlatiruResponseModel
 
-	err = json.Unmarshal(b, &SteamPayResponse)
+	err = json.Unmarshal(b, &PlatiruResponse)
 	if err != nil {
 		log.Println(err)
 		return model.GamePriceResponse{}, nil
 	}
 
 	var PriceResponse model.GamePriceResponse
-	PriceResponse.StoreName = "steampay"
+	PriceResponse.StoreName = "platiru"
 	PriceResponse.StoreAppName = name
+
+	minPrice := 9999999.9
 
 	found := false
 
-	for _, i := range SteamPayResponse.Products {
-		if i.Title == name {
-			PriceResponse.StorePrice = strconv.Itoa(i.Prices.Rub) + " руб."
-			found = true
+	for _, item := range PlatiruResponse.Items {
+		if strings.Contains(item.NameEng, name) && strings.Contains(strings.ToLower(item.NameEng), "key") {
+			if item.PriceRur < minPrice {
+				minPrice = item.PriceRur
+				PriceResponse.StoreAppID = item.ID
+				found = true
+			}
 		}
+	}
+
+	if found {
+		PriceResponse.StorePrice = strconv.Itoa(int(minPrice)) + " руб."
 	}
 
 	if !found {
 		PriceResponse.Status = "game not found in store"
 	}
-
 	return PriceResponse, nil
 }

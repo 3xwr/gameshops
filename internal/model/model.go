@@ -210,7 +210,7 @@ type GOGResponseModel struct {
 	TotalMoviesFound int         `json:"totalMoviesFound"`
 }
 
-type SteamPayResponse struct {
+type SteamPayResponseModel struct {
 	Error    int `json:"error"`
 	Products []struct {
 		URL         string `json:"url"`
@@ -226,4 +226,50 @@ type SteamPayResponse struct {
 			Grn int     `json:"grn"`
 		} `json:"prices"`
 	} `json:"products"`
+}
+
+type PlatiruResponseModel struct {
+	Pagenum    int `json:"Pagenum"`
+	Pagesize   int `json:"Pagesize"`
+	Totalpages int `json:"Totalpages"`
+	Items      []struct {
+		ID                           int     `json:"id"`
+		Name                         string  `json:"name"`
+		NameEng                      string  `json:"name_eng"`
+		NameTranslit                 string  `json:"name_translit"`
+		NameTranslitEng              string  `json:"name_translit_eng"`
+		PartnerCommiss               float64 `json:"partner_commiss"`
+		PriceEur                     float64 `json:"price_eur"`
+		PriceRur                     float64 `json:"price_rur"`
+		PriceUah                     float64 `json:"price_uah"`
+		PriceUsd                     float64 `json:"price_usd"`
+		SectionID                    int     `json:"section_id"`
+		URL                          string  `json:"url"`
+		Description                  string  `json:"description"`
+		DescriptionEng               string  `json:"description_eng"`
+		Image                        string  `json:"image"`
+		SellerID                     int     `json:"seller_id"`
+		SellerName                   string  `json:"seller_name"`
+		SellerRating                 float64 `json:"seller_rating"`
+		Numsold                      int     `json:"numsold"`
+		NumsoldHidden                int     `json:"numsold_hidden"`
+		CountPositiveresponses       int     `json:"count_positiveresponses"`
+		CountPositiveresponsesHidden int     `json:"count_positiveresponses_hidden"`
+		CountNegativeresponses       int     `json:"count_negativeresponses"`
+		CountNegativeresponsesHidden int     `json:"count_negativeresponses_hidden"`
+		CountReturns                 int     `json:"count_returns"`
+		CountReturnsHidden           int     `json:"count_returns_hidden"`
+		SalesForm                    string  `json:"sales_form"`
+		SaleInfo                     struct {
+			CommonBasePrice string `json:"common_base_price"`
+			CommonPriceUsd  string `json:"common_price_usd"`
+			CommonPriceRur  string `json:"common_price_rur"`
+			CommonPriceEur  string `json:"common_price_eur"`
+			CommonPriceUah  string `json:"common_price_uah"`
+			SalePercent     string `json:"sale_percent"`
+		} `json:"sale_info"`
+		HideSales interface{} `json:"hide_sales"`
+		Payadv    float64     `json:"payadv"`
+	} `json:"items"`
+	Total int `json:"total"`
 }
