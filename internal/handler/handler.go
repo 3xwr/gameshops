@@ -18,6 +18,7 @@ type Service interface {
 	GetSteamPayPriceByName(name string) (model.GamePriceResponse, error)
 	GetPlatiruPriceByName(name string) (model.GamePriceResponse, error)
 	GetAllPricesByName(name string) ([]model.GamePriceResponse, error)
+	GetNameFromInput(name string) ([]string, error)
 }
 
 func New(logger *zerolog.Logger, service Service) *Handler {
@@ -80,6 +81,17 @@ func (h *Handler) PlatiruHandler(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) CompareHandler(w http.ResponseWriter, r *http.Request) {
 	appName := r.URL.Query().Get("name")
 	resp, err := h.service.GetAllPricesByName(appName)
+	if err != nil {
+		h.logger.Info().Err(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"error":"Internal Server Error"}`))
+	}
+	writeResponse(w, http.StatusOK, resp)
+}
+
+func (h *Handler) GetNameHandler(w http.ResponseWriter, r *http.Request) {
+	appName := r.URL.Query().Get("name")
+	resp, err := h.service.GetNameFromInput(appName)
 	if err != nil {
 		h.logger.Info().Err(err)
 		w.WriteHeader(http.StatusInternalServerError)

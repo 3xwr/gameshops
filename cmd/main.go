@@ -30,6 +30,7 @@ func main() {
 		r.Get("/gogprice", h.GOGPriceHandler)
 		r.Get("/platiruprice", h.PlatiruHandler)
 		r.Get("/compareprice", h.CompareHandler)
+		r.Get("/getname", h.GetNameHandler)
 	})
 
 	srv := http.Server{
