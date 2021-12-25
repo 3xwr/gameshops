@@ -26,6 +26,7 @@ func main() {
 
 	r.Route("/", func(r chi.Router) {
 		r.Get("/steamprice", h.SteamPriceHandler)
+		r.Get("/gogprice", h.GOGPriceHandler)
 	})
 
 	srv := http.Server{

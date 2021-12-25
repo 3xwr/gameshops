@@ -13,9 +13,8 @@ type Handler struct {
 }
 
 type Service interface {
-	GetAppPriceByID(ID int) (string, error)
-	GetAppIDByName(name string) (int, error)
 	GetSteamPriceByName(name string) (model.GamePriceResponse, error)
+	GetGOGPriceByName(name string) (model.GamePriceResponse, error)
 }
 
 func New(logger *zerolog.Logger, service Service) *Handler {
@@ -29,6 +28,19 @@ func (h *Handler) SteamPriceHandler(w http.ResponseWriter, r *http.Request) {
 	appName := r.URL.Query().Get("name")
 
 	resp, err := h.service.GetSteamPriceByName(appName)
+	if err != nil {
+		h.logger.Info().Err(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"error":"Internal Server Error"}`))
+		return
+	}
+	writeResponse(w, http.StatusOK, resp)
+}
+
+func (h *Handler) GOGPriceHandler(w http.ResponseWriter, r *http.Request) {
+	appName := r.URL.Query().Get("name")
+
+	resp, err := h.service.GetGOGPriceByName(appName)
 	if err != nil {
 		h.logger.Info().Err(err)
 		w.WriteHeader(http.StatusInternalServerError)

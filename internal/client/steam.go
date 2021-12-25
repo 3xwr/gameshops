@@ -42,7 +42,7 @@ func New() *Client {
 	}
 }
 
-func (c *Client) GetAppIDByName(name string) (int, error) {
+func (c *Client) GetSteamAppIDByName(name string) (int, error) {
 	log.Println(name)
 	URL := "https://api.steampowered.com/ISteamApps/GetAppList/v2/"
 	req, err := http.NewRequest(http.MethodGet, URL, nil)
@@ -83,7 +83,7 @@ func (c *Client) GetAppIDByName(name string) (int, error) {
 }
 
 func (c *Client) GetSteamPriceByName(name string) (model.GamePriceResponse, error) {
-	appID, err := c.GetAppIDByName(name)
+	appID, err := c.GetSteamAppIDByName(name)
 	if err != nil {
 		return model.GamePriceResponse{}, err
 	}
@@ -92,7 +92,7 @@ func (c *Client) GetSteamPriceByName(name string) (model.GamePriceResponse, erro
 		return model.GamePriceResponse{StoreName: "steam", StoreAppName: name, Status: "game not found in store"}, nil
 	}
 
-	Price, err := c.GetAppPriceByID(appID)
+	Price, err := c.GetSteamAppPriceByID(appID)
 	if err != nil {
 		return model.GamePriceResponse{}, err
 	}
@@ -100,7 +100,7 @@ func (c *Client) GetSteamPriceByName(name string) (model.GamePriceResponse, erro
 	return model.GamePriceResponse{StoreName: "steam", StoreAppID: appID, StoreAppName: name, StorePrice: Price}, nil
 }
 
-func (c *Client) GetAppPriceByID(ID int) (string, error) {
+func (c *Client) GetSteamAppPriceByID(ID int) (string, error) {
 	fmt.Println("Looking for Steam app with ID - ", ID)
 	baseURL := "https://store.steampowered.com/api/appdetails?"
 	params := url.Values{}
