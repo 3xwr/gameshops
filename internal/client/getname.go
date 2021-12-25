@@ -3,7 +3,6 @@ package client
 import (
 	"encoding/json"
 	"io"
-	"log"
 	"net/http"
 	"sort"
 	"strings"
@@ -62,8 +61,7 @@ func (c *Client) GetNameFromInput(name string) ([]string, error) {
 			return []string{name}, nil
 		}
 	}
-	log.Println(rankMapStringfloat(similarityMap))
-	return nil, nil
+	return rankMapStringfloat(similarityMap), nil
 }
 
 func rankMapStringfloat(values map[string]float64) []string {
@@ -82,5 +80,5 @@ func rankMapStringfloat(values map[string]float64) []string {
 	for i, kv := range ss {
 		ranked[i] = kv.Key
 	}
-	return ranked[0:10]
+	return ranked[0:5]
 }
