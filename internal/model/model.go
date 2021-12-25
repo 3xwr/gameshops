@@ -9,6 +9,7 @@ type GamePriceResponse struct {
 	StoreAppID   int    `json:"store_app_id,omitempty"`
 	StoreAppName string `json:"store_app_name"`
 	StorePrice   string `json:"store_price,omitempty"`
+	StoreImage   string `json:"store_image,omitempty"`
 	Status       string `json:"status,omitempty"`
 }
 

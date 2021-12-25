@@ -53,6 +53,7 @@ func (c *Client) GetGOGPriceByName(name string) (model.GamePriceResponse, error)
 	for _, i := range GOGResponse.Products {
 		if i.Title == name {
 			PriceResponse.StoreAppID = i.ID
+			PriceResponse.StoreImage = "https:" + i.Image
 			PriceResponse.StorePrice = i.Price.FinalAmount + " руб."
 			found = true
 		}

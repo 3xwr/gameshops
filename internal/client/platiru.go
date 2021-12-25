@@ -60,6 +60,7 @@ func (c *Client) GetPlatiruPriceByName(name string) (model.GamePriceResponse, er
 			if item.PriceRur < minPrice {
 				minPrice = item.PriceRur
 				PriceResponse.StoreAppID = item.ID
+				PriceResponse.StoreImage = "https:" + item.Image
 				found = true
 			}
 		}

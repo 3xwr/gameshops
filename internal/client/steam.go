@@ -92,15 +92,15 @@ func (c *Client) GetSteamPriceByName(name string) (model.GamePriceResponse, erro
 		return model.GamePriceResponse{StoreName: "steam", StoreAppName: name, Status: "game not found in store"}, nil
 	}
 
-	Price, err := c.GetSteamAppPriceByID(appID)
+	Price, image, err := c.GetSteamAppPriceByID(appID)
 	if err != nil {
 		return model.GamePriceResponse{}, err
 	}
 
-	return model.GamePriceResponse{StoreName: "steam", StoreAppID: appID, StoreAppName: name, StorePrice: Price}, nil
+	return model.GamePriceResponse{StoreName: "steam", StoreAppID: appID, StoreAppName: name, StorePrice: Price, StoreImage: image}, nil
 }
 
-func (c *Client) GetSteamAppPriceByID(ID int) (string, error) {
+func (c *Client) GetSteamAppPriceByID(ID int) (string, string, error) {
 	fmt.Println("Looking for Steam app with ID - ", ID)
 	baseURL := "https://store.steampowered.com/api/appdetails?"
 	params := url.Values{}
@@ -112,26 +112,26 @@ func (c *Client) GetSteamAppPriceByID(ID int) (string, error) {
 
 	req, err := http.NewRequest(http.MethodGet, link, nil)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	resp, err := c.client.Do(req)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	defer resp.Body.Close()
 
 	b, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	var objmap map[string]interface{}
 
 	err = json.Unmarshal(b, &objmap)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	var Final interface{}
@@ -139,11 +139,13 @@ func (c *Client) GetSteamAppPriceByID(ID int) (string, error) {
 	StringId := strconv.Itoa(ID)
 	Info := objmap[StringId].(map[string]interface{})
 	Data := Info["data"].(map[string]interface{})
+
 	if Data["price_overview"] == nil {
 		Final = 0.0
 	} else {
 		PriceOverview := Data["price_overview"].(map[string]interface{})
 		Final = PriceOverview["final"]
 	}
-	return fmt.Sprintf("%d руб.", int(Final.(float64))/100), nil
+
+	return fmt.Sprintf("%d руб.", int(Final.(float64))/100), Data["header_image"].(string), nil
 }
