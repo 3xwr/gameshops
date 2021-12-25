@@ -84,7 +84,6 @@ func (h *Handler) CompareHandler(w http.ResponseWriter, r *http.Request) {
 		h.logger.Info().Err(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(`{"error":"Internal Server Error"}`))
-		return
 	}
 	writeResponse(w, http.StatusOK, resp)
 }

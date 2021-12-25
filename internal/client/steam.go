@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"gameservice/internal/model"
@@ -116,8 +117,11 @@ func (c *Client) GetSteamAppPriceByID(ID int) (string, string, error) {
 	if err != nil {
 		return "", "", err
 	}
+	timeout := 5 * time.Second
+	ctx, cancel := context.WithTimeout(req.Context(), time.Duration(timeout))
 
-	resp, err := c.client.Do(req)
+	resp, err := c.client.Do(req.WithContext(ctx))
+	defer cancel()
 	if err != nil {
 		return "", "", err
 	}
