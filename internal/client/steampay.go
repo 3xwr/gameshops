@@ -55,6 +55,7 @@ func (c *Client) GetSteamPayPriceByName(name string) (model.GamePriceResponse, e
 		if i.Title == name {
 			PriceResponse.StorePrice = strconv.Itoa(i.Prices.Rub) + " руб."
 			PriceResponse.StoreImage = i.Image
+			PriceResponse.StoreAppURL = i.URL
 			found = true
 		}
 	}

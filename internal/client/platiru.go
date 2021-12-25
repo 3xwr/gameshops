@@ -61,6 +61,7 @@ func (c *Client) GetPlatiruPriceByName(name string) (model.GamePriceResponse, er
 				minPrice = item.PriceRur
 				PriceResponse.StoreAppID = item.ID
 				PriceResponse.StoreImage = "https:" + item.Image
+				PriceResponse.StoreAppURL = item.URL
 				found = true
 			}
 		}

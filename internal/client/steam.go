@@ -97,7 +97,9 @@ func (c *Client) GetSteamPriceByName(name string) (model.GamePriceResponse, erro
 		return model.GamePriceResponse{}, err
 	}
 
-	return model.GamePriceResponse{StoreName: "steam", StoreAppID: appID, StoreAppName: name, StorePrice: Price, StoreImage: image}, nil
+	SteamPageUrl := "https://store.steampowered.com/app/" + strconv.Itoa(appID)
+
+	return model.GamePriceResponse{StoreName: "steam", StoreAppID: appID, StoreAppName: name, StorePrice: Price, StoreImage: image, StoreAppURL: SteamPageUrl}, nil
 }
 
 func (c *Client) GetSteamAppPriceByID(ID int) (string, string, error) {

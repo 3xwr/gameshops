@@ -55,6 +55,7 @@ func (c *Client) GetGOGPriceByName(name string) (model.GamePriceResponse, error)
 			PriceResponse.StoreAppID = i.ID
 			PriceResponse.StoreImage = "https:" + i.Image
 			PriceResponse.StorePrice = i.Price.FinalAmount + " руб."
+			PriceResponse.StoreAppURL = "https://gog.com" + i.URL
 			found = true
 		}
 	}
