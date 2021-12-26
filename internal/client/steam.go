@@ -98,6 +98,10 @@ func (c *Client) GetSteamPriceByName(name string) (model.GamePriceResponse, erro
 		return model.GamePriceResponse{}, err
 	}
 
+	if Price == "" {
+		return model.GamePriceResponse{StoreName: "steam", StoreAppName: name, Status: "game not found in store"}, nil
+	}
+
 	SteamPageUrl := "https://store.steampowered.com/app/" + strconv.Itoa(appID)
 
 	return model.GamePriceResponse{StoreName: "steam", StoreAppID: appID, StoreAppName: name, StorePrice: Price, StoreImage: image, StoreAppURL: SteamPageUrl}, nil
@@ -144,14 +148,17 @@ func (c *Client) GetSteamAppPriceByID(ID int) (string, string, error) {
 
 	StringId := strconv.Itoa(ID)
 	Info := objmap[StringId].(map[string]interface{})
-	Data := Info["data"].(map[string]interface{})
+	if Info["data"] != nil {
+		Data := Info["data"].(map[string]interface{})
 
-	if Data["price_overview"] == nil {
-		Final = 0.0
-	} else {
-		PriceOverview := Data["price_overview"].(map[string]interface{})
-		Final = PriceOverview["final"]
+		if Data["price_overview"] == nil {
+			Final = 0.0
+		} else {
+			PriceOverview := Data["price_overview"].(map[string]interface{})
+			Final = PriceOverview["final"]
+		}
+
+		return fmt.Sprintf("%d руб.", int(Final.(float64))/100), Data["header_image"].(string), nil
 	}
-
-	return fmt.Sprintf("%d руб.", int(Final.(float64))/100), Data["header_image"].(string), nil
+	return "", "", nil
 }
