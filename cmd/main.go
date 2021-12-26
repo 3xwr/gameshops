@@ -11,13 +11,15 @@ import (
 
 	"gameservice/internal/client"
 	"gameservice/internal/handler"
+	"gameservice/internal/repository"
 
 	"github.com/go-chi/chi"
 	"github.com/rs/zerolog"
 )
 
 func main() {
-	c := client.New()
+	cache := repository.NewCache(10 * time.Minute)
+	c := client.New(cache)
 
 	logger := zerolog.New(os.Stdout).With().Timestamp().Logger()
 	h := handler.New(&logger, c)

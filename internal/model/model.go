@@ -1,17 +1,20 @@
 package model
 
+import "time"
+
 type SteamRequestModel struct {
 	Name string `json:"name"`
 }
 
 type GamePriceResponse struct {
-	StoreName    string `json:"store_name"`
-	StoreAppID   int    `json:"store_app_id,omitempty"`
-	StoreAppName string `json:"store_app_name"`
-	StorePrice   string `json:"store_price,omitempty"`
-	StoreImage   string `json:"store_image,omitempty"`
-	StoreAppURL  string `json:"store_app_url,omitempty"`
-	Status       string `json:"status,omitempty"`
+	StoreName    string    `json:"store_name"`
+	StoreAppID   int       `json:"store_app_id,omitempty"`
+	StoreAppName string    `json:"store_app_name"`
+	StorePrice   string    `json:"store_price,omitempty"`
+	StoreImage   string    `json:"store_image,omitempty"`
+	StoreAppURL  string    `json:"store_app_url,omitempty"`
+	Status       string    `json:"status,omitempty"`
+	Timestamp    time.Time `json:"timestamp,omitempty"`
 }
 
 type SteamResponseModel struct {

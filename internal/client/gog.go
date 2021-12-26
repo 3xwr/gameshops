@@ -7,9 +7,19 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"time"
 )
 
 func (c *Client) GetGOGPriceByName(name string) (model.GamePriceResponse, error) {
+	StoreName := "gog"
+	if p, ok := c.repo.Load(name + StoreName); ok {
+		log.Println("GOG price for", name, "found in cache")
+		t := time.Now()
+		diff := t.Sub(p.Timestamp)
+		if diff < c.repo.GetTimeout() {
+			return p, nil
+		}
+	}
 	link := "https://embed.gog.com/games/ajax/filtered?mediaType=game&"
 
 	params := url.Values{}
@@ -63,6 +73,6 @@ func (c *Client) GetGOGPriceByName(name string) (model.GamePriceResponse, error)
 	if !found {
 		PriceResponse.Status = "game not found in store"
 	}
-
+	c.repo.Store(name+StoreName, PriceResponse)
 	return PriceResponse, nil
 }

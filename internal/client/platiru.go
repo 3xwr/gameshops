@@ -9,9 +9,19 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func (c *Client) GetPlatiruPriceByName(name string) (model.GamePriceResponse, error) {
+	StoreName := "platiru"
+	if p, ok := c.repo.Load(name + StoreName); ok {
+		log.Println("PlatiRu price for", name, "found in cache")
+		t := time.Now()
+		diff := t.Sub(p.Timestamp)
+		if diff < c.repo.GetTimeout() {
+			return p, nil
+		}
+	}
 	link := "https://plati.io/api/search.ashx?"
 	params := url.Values{}
 	params.Add("response", "json")
@@ -74,5 +84,7 @@ func (c *Client) GetPlatiruPriceByName(name string) (model.GamePriceResponse, er
 	if !found {
 		PriceResponse.Status = "game not found in store"
 	}
+
+	c.repo.Store(name+StoreName, PriceResponse)
 	return PriceResponse, nil
 }

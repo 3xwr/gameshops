@@ -8,9 +8,19 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"time"
 )
 
 func (c *Client) GetSteamPayPriceByName(name string) (model.GamePriceResponse, error) {
+	StoreName := "steampay"
+	if p, ok := c.repo.Load(name + StoreName); ok {
+		log.Println("SteamPay price for", name, "found in cache")
+		t := time.Now()
+		diff := t.Sub(p.Timestamp)
+		if diff < c.repo.GetTimeout() {
+			return p, nil
+		}
+	}
 	link := "https://steampay.com/api/search?"
 
 	params := url.Values{}
@@ -64,5 +74,6 @@ func (c *Client) GetSteamPayPriceByName(name string) (model.GamePriceResponse, e
 		PriceResponse.Status = "game not found in store"
 	}
 
+	c.repo.Store(name+StoreName, PriceResponse)
 	return PriceResponse, nil
 }

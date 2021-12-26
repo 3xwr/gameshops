@@ -16,6 +16,7 @@ import (
 
 type Client struct {
 	client http.Client
+	repo   Repository
 }
 
 type AppListResponse struct {
@@ -35,12 +36,19 @@ type AppInfoResponse struct {
 	} `json:"price_overview"`
 }
 
-func New() *Client {
+func New(repo Repository) *Client {
 	return &Client{
 		client: http.Client{
 			Timeout: time.Duration(time.Minute),
 		},
+		repo: repo,
 	}
+}
+
+type Repository interface {
+	Load(string) (model.GamePriceResponse, bool)
+	Store(string, model.GamePriceResponse)
+	GetTimeout() time.Duration
 }
 
 func (c *Client) GetSteamAppIDByName(name string) (int, error) {
@@ -84,13 +92,24 @@ func (c *Client) GetSteamAppIDByName(name string) (int, error) {
 }
 
 func (c *Client) GetSteamPriceByName(name string) (model.GamePriceResponse, error) {
+	StoreName := "steam"
+	if p, ok := c.repo.Load(name + StoreName); ok {
+		log.Println("Steam price for", name, "found in cache")
+		t := time.Now()
+		diff := t.Sub(p.Timestamp)
+		if diff < c.repo.GetTimeout() {
+			return p, nil
+		}
+	}
+
 	appID, err := c.GetSteamAppIDByName(name)
 	if err != nil {
 		return model.GamePriceResponse{}, err
 	}
 
 	if appID == -1 {
-		return model.GamePriceResponse{StoreName: "steam", StoreAppName: name, Status: "game not found in store"}, nil
+		c.repo.Store(name+StoreName, model.GamePriceResponse{StoreName: StoreName, StoreAppName: name, Status: "game not found in store"})
+		return model.GamePriceResponse{StoreName: StoreName, StoreAppName: name, Status: "game not found in store"}, nil
 	}
 
 	Price, image, err := c.GetSteamAppPriceByID(appID)
@@ -99,12 +118,14 @@ func (c *Client) GetSteamPriceByName(name string) (model.GamePriceResponse, erro
 	}
 
 	if Price == "" {
-		return model.GamePriceResponse{StoreName: "steam", StoreAppName: name, Status: "game not found in store"}, nil
+		c.repo.Store(name+StoreName, model.GamePriceResponse{StoreName: StoreName, StoreAppName: name, Status: "game not found in store"})
+		return model.GamePriceResponse{StoreName: StoreName, StoreAppName: name, Status: "game not found in store"}, nil
 	}
 
 	SteamPageUrl := "https://store.steampowered.com/app/" + strconv.Itoa(appID)
 
-	return model.GamePriceResponse{StoreName: "steam", StoreAppID: appID, StoreAppName: name, StorePrice: Price, StoreImage: image, StoreAppURL: SteamPageUrl}, nil
+	c.repo.Store(name+StoreName, model.GamePriceResponse{StoreName: StoreName, StoreAppID: appID, StoreAppName: name, StorePrice: Price, StoreImage: image, StoreAppURL: SteamPageUrl})
+	return model.GamePriceResponse{StoreName: StoreName, StoreAppID: appID, StoreAppName: name, StorePrice: Price, StoreImage: image, StoreAppURL: SteamPageUrl}, nil
 }
 
 func (c *Client) GetSteamAppPriceByID(ID int) (string, string, error) {
