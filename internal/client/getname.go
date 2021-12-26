@@ -3,6 +3,7 @@ package client
 import (
 	"encoding/json"
 	"io"
+	"log"
 	"net/http"
 	"sort"
 	"strings"
@@ -39,7 +40,7 @@ func (c *Client) GetNameFromInput(name string) ([]string, error) {
 		return nil, err
 	}
 
-	j := metrics.NewSorensenDice()
+	j := metrics.NewJaccard()
 
 	similarityMap := make(map[string]float64)
 	splitName := strings.Split(name, " ")
@@ -50,18 +51,20 @@ func (c *Client) GetNameFromInput(name string) ([]string, error) {
 		for _, word := range splitName {
 			for _, word2 := range splitItemName {
 				if strings.EqualFold(word, word2) {
-					similarityMap[item.Name] += float64(len(word)) * 0.05
+					similarityMap[item.Name] += float64(len(word)) * 0.06
 				}
 			}
-		}
-		if strings.Contains(item.Name, name) {
-			similarityMap[item.Name] += 0.3
 		}
 		if strings.EqualFold(item.Name, name) {
 			return []string{name}, nil
 		}
 	}
-	return rankMapStringfloat(similarityMap), nil
+	arr := rankMapStringfloat(similarityMap)
+	for _, i := range arr {
+		log.Println(i, similarityMap[i])
+	}
+
+	return nil, nil
 }
 
 func rankMapStringfloat(values map[string]float64) []string {
@@ -80,5 +83,5 @@ func rankMapStringfloat(values map[string]float64) []string {
 	for i, kv := range ss {
 		ranked[i] = kv.Key
 	}
-	return ranked[0:5]
+	return ranked[0:10]
 }

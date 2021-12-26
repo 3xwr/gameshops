@@ -117,7 +117,7 @@ func (c *Client) GetSteamAppPriceByID(ID int) (string, string, error) {
 	if err != nil {
 		return "", "", err
 	}
-	timeout := 5 * time.Second
+	timeout := 15 * time.Second
 	ctx, cancel := context.WithTimeout(req.Context(), time.Duration(timeout))
 
 	resp, err := c.client.Do(req.WithContext(ctx))
